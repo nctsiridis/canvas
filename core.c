@@ -21,7 +21,7 @@ AppData default_app_data() {
 	SDL_Rect default_view_rect = {0, 0, 500, 500};
 	SDLComp sdl_comp = sdl_compose("Canvas", default_view_rect, SDL_WINDOW_RESIZABLE, 0);
 
-	View default_view = {.update = canvas_update, .rect = default_view_rect};
+	View default_view = {.update=canvas_update, .rect=default_view_rect, .data=NULL};
 	ViewNode *view_head = malloc(sizeof(*view_head));
 	*view_head = (ViewNode){default_view, NULL, NULL};
 
@@ -45,7 +45,7 @@ void context_update_all(AppData* app_data) {
 		bool b = context_iter->context.index == app_data->context_index ? true : false;
 		ViewNode* view_iter = context_iter->context.view_head;
 		while (view_iter) {
-			view_iter->view.update(app_data, b, view_iter->view.rect);
+			view_iter->view.update(app_data, b, view_iter->view.rect, view_iter->view.data);
 			view_iter = view_iter->next;
 		}
 		context_iter = context_iter->next;

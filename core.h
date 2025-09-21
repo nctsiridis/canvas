@@ -3,7 +3,8 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
 
 struct ContextNode;
@@ -26,8 +27,9 @@ typedef struct {
 } AppData;
 
 typedef struct {
-	void (*update)(AppData *app_data, bool draw, SDL_Rect rect);
+	void (*update)(AppData *app_data, bool draw, SDL_Rect rect, void* data);
 	SDL_Rect rect;
+	void* data;
 } View;
 
 typedef struct ViewNode {
