@@ -8,7 +8,7 @@ typedef struct {
 	SDL_Texture **glyphs;
 } CanvasData;
 
-void canvas_update(AppData* app_data, bool draw, SDL_Rect rect, void* data);
+void canvas_update(AppData* app_data, bool draw, SDL_Rect rect, void** data);
 
 CanvasData* canvas_default_data();
 

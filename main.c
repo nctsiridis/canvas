@@ -8,13 +8,18 @@ int main() {
 		return 1;
 	}
 
+	if (TTF_Init() == -1) {
+		printf("TTF_Init failed: %s\n", TTF_GetError());
+		return 1;
+	}
+
 	while (app_data.running) {
 		SDL_Event e;
 		SDL_WaitEvent(&e);
 		parse_sdl_event(&app_data, &e);
 		SDL_SetRenderDrawColor(app_data.sdl_comp.renderer, 0, 0, 0, 255);
 		SDL_RenderClear(app_data.sdl_comp.renderer);
-		context_update_all(&app_data); // handle widget related stuff and draw
+		context_update_all(&app_data);
 		SDL_RenderPresent(app_data.sdl_comp.renderer);
 	}
 

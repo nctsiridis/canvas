@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 struct ContextNode;
-struct ViewNode;
+struct ContextComponentNode;
 
 typedef struct {
 	SDL_Window *window;
@@ -27,21 +27,21 @@ typedef struct {
 } AppData;
 
 typedef struct {
-	void (*update)(AppData *app_data, bool draw, SDL_Rect rect, void* data);
+	void (*update)(AppData *app_data, bool draw, SDL_Rect rect, void** data);
 	SDL_Rect rect;
 	void* data;
-} View;
+} ContextComponent;
 
-typedef struct ViewNode {
-	View view;
-	struct ViewNode *next;
-	struct ViewNode *prev;
-} ViewNode;
+typedef struct ContextComponentNode {
+	ContextComponent view;
+	struct ContextComponentNode *next;
+	struct ContextComponentNode *prev;
+} ContextComponentNode;
 
 typedef struct {
 	char* name;
 	int index;
-	ViewNode* view_head;
+	ContextComponentNode* view_head;
 } Context;
 
 typedef struct ContextNode {
