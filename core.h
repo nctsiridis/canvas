@@ -11,11 +11,11 @@ struct ContextNode;
 struct ContextComponentNode;
 
 typedef struct {
+	int window_width, window_height;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-	int window_width;
-	int window_height;
-} SDLComp;
+	SDL_Event *event;
+} SDLData;
 
 typedef struct {
 	bool running;
@@ -23,11 +23,16 @@ typedef struct {
 	int tab_count;
 	int tab_size; // percentage
 	struct ContextNode* context_head;
-	SDLComp sdl_comp;
+	SDLData sdl;
 } AppData;
 
+typedef struct ContextForward {
+	bool visible;
+	bool frame_update;
+} ContextForward;
+
 typedef struct {
-	void (*update)(AppData *app_data, bool draw, SDL_Rect rect, void** data);
+	void (*update)(AppData *app_data, ContextForward context, SDL_Rect rect, void** d);
 	SDL_Rect rect;
 	void* data;
 } ContextComponent;
@@ -50,17 +55,20 @@ typedef struct ContextNode {
 	struct ContextNode *prev;
 } ContextNode;
 
-SDLComp sdl_compose(
+typedef struct ContextBackward {
+} ContextBackward;
+
+SDLData sdl_compose(
 	char* window_name,
 	SDL_Rect rect,
 	int window_flags,
 	int renderer_flags
 );
 AppData default_app_data();
-void close_sdl(AppData* app_data);
-void render_base(AppData* app_data);
-void context_update_all(AppData* app_data);
-void parse_sdl_event(AppData *app_data, SDL_Event *e);
+void close_sdl(AppData *app_data);
+void render_base(AppData *app_data);
+void context_update_all(AppData *app_data, ContextForward context);
+void parse_sdl_event(AppData *app_data, SDL_Event *e, ContextForward *context);
 
 #endif
 

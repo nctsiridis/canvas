@@ -2,13 +2,19 @@
 #define CANVAS_H
 #include "../core.h"
 
-typedef struct {
-	int num_rows, num_cols, row_pos, col_pos;
+typedef struct LineNode {
+	struct LineNode *prev, *next;
 	char* text;
+} LineNode;
+
+typedef struct {
+	int rows_on_screen, cols_on_screen;
+	int line_pos, inline_pos, frame_pos; // frame_pos = index of first line in the visible frame
+	LineNode *line;
 	SDL_Texture **glyphs;
 } CanvasData;
 
-void canvas_update(AppData* app_data, bool draw, SDL_Rect rect, void** data);
+void canvas_update(AppData* app_data, ContextForward context, SDL_Rect rect, void** d);
 
 CanvasData* canvas_default_data();
 
