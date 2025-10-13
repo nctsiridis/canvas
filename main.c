@@ -25,6 +25,7 @@ int main() {
 		SDL_RenderPresent(app_data.sdl.renderer);
 	}
 
+	SDL_StopTextInput();
 	close_sdl(&app_data);
 	return 0;
 }

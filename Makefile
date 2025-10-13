@@ -8,7 +8,7 @@ DAROOT = /users/nicotsiridis/daroot
 HII_PATH = $(DAROOT)/github~nctsiridis/hii@v1.0.0
 BIN = program
 
-DFLAGS = -g -O0 -Wall -Wextra
+DFLAGS = -Wall -Wextra
 CFLAGS = -I$(SDL_INCLUDE) -I$(HII_PATH)
 LDFLAGS = -L$(SDL_LIB) -lsdl2 -lSDL2_ttf
 

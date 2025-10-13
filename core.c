@@ -22,10 +22,10 @@ AppData default_app_data() {
 	SDLData sdl_data = sdl_compose("Canvas", default_view_rect, SDL_WINDOW_RESIZABLE, 0);
 
 	ContextComponent default_view = {.update=canvas_update, .rect=default_view_rect, .data=NULL};
-	ContextComponentNode *view_head = malloc(sizeof(*view_head));
-	*view_head = (ContextComponentNode){default_view, NULL, NULL};
+	ContextComponentNode *context_component_head = malloc(sizeof(*context_component_head));
+	*context_component_head = (ContextComponentNode){default_view, NULL, NULL};
 
-	Context canvas = {.name = "Canvas", .index = 0, .view_head = view_head};
+	Context canvas = {.name = "1", .index = 0, .context_component_head = context_component_head};
 
 	ContextNode *context_head = malloc(sizeof(*context_head));
 	*context_head = (ContextNode){canvas, NULL, NULL};
@@ -43,13 +43,13 @@ void context_update_all(AppData* app_data, ContextForward context) {
 	ContextNode* context_iter = app_data->context_head;
 	while (context_iter) {
 		if (context_iter->context.index == app_data->context_index) context.visible = true;
-		ContextComponentNode* context_component_iter = context_iter->context.view_head;
+		ContextComponentNode* context_component_iter = context_iter->context.context_component_head;
 		while (context_component_iter) {
-			context_component_iter->view.update(
+			context_component_iter->context_component.update(
 				app_data, 
 				context, 
-				context_component_iter->view.rect, 
-				&context_component_iter->view.data
+				context_component_iter->context_component.rect, 
+				&context_component_iter->context_component.data
 			);
 			context_component_iter = context_component_iter->next;
 		}

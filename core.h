@@ -38,7 +38,7 @@ typedef struct {
 } ContextComponent;
 
 typedef struct ContextComponentNode {
-	ContextComponent view;
+	ContextComponent context_component;
 	struct ContextComponentNode *next;
 	struct ContextComponentNode *prev;
 } ContextComponentNode;
@@ -46,7 +46,7 @@ typedef struct ContextComponentNode {
 typedef struct {
 	char* name;
 	int index;
-	ContextComponentNode* view_head;
+	ContextComponentNode* context_component_head;
 } Context;
 
 typedef struct ContextNode {
