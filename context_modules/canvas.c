@@ -12,25 +12,32 @@ LineNode* make_new_line(int size) {
 	return res;
 }
 
-CanvasData* init_canvas_data(SDL_Renderer* renderer, SDL_Rect rect) {
+CanvasData* init_canvas_data(AppData *app_data, RelativeRect rect) {
+	SDL_Rect true_rect = {
+		app_data->sdl.window_width * rect.x_norm,
+		app_data->sdl.window_height * rect.y_norm,
+		app_data->sdl.window_width * rect.w_norm,
+		app_data->sdl.window_height * rect.h_norm
+	};
 	CanvasData *canvas_data = malloc(sizeof(CanvasData));
 	SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
 	TTF_Font* font = TTF_OpenFont("res/short_baby.ttf", 20);
 	if (!font) printf("Font creationg failed\n");
 	canvas_data->rows_on_screen = ROWS_ON_SCREEN; // TODO
 	canvas_data->cols_on_screen = COLS_ON_SCREEN;
-	canvas_data->sym_width = rect.w / COLS_ON_SCREEN;
-	canvas_data->sym_height = rect.h / ROWS_ON_SCREEN;
+	canvas_data->sym_width = true_rect.w / COLS_ON_SCREEN;
+	canvas_data->sym_height = true_rect.h / ROWS_ON_SCREEN;
 	canvas_data->line_pos = 0;
 	canvas_data->inline_pos = 0;
 	canvas_data->frame_pos = 0;
 	canvas_data->glyphs = malloc(sizeof(SDL_Texture*) * 127);
 	canvas_data->line = make_new_line(COLS_ON_SCREEN);
+	canvas_data->rect = true_rect;
 
 	for (int ch = 32; ch <= 126; ch++) {
 		char str[2] = {ch, '\0'};
 		SDL_Surface* surf = TTF_RenderText_Solid(font, str, color);
-		canvas_data->glyphs[ch] = SDL_CreateTextureFromSurface(renderer, surf);
+		canvas_data->glyphs[ch] = SDL_CreateTextureFromSurface(app_data->sdl.renderer, surf);
 	}
 
 	return canvas_data;
@@ -73,23 +80,23 @@ void update_text(AppData* app_data, CanvasData *data) {
 	}
 }
 
-void draw_cursor(AppData* app_data, CanvasData* data, SDL_Rect rect) {
+void draw_cursor(AppData* app_data, CanvasData* data) {
 	SDL_SetRenderDrawColor(app_data->sdl.renderer, 0xFF, 0x00, 0x00, 0xFF);
 	SDL_RenderDrawRect(
 		app_data->sdl.renderer, 
 		&((SDL_Rect){
-			data->sym_width * data->inline_pos, 
-			data->sym_height * data->line_pos,
+			data->rect.x + data->sym_width * data->inline_pos, 
+			data->rect.y + data->sym_height * data->line_pos,
 			data->sym_width, 
 			data->sym_height
 		})
 	); // TODO Offset
 }
 
-void draw_text(AppData* app_data, CanvasData *data, SDL_Rect rect) {
+void draw_text(AppData* app_data, CanvasData *data) {
 	SDL_Rect dst_base = {
-		0, 
-		data->sym_height * data->line_pos, 
+		data->rect.x, 
+		data->rect.y + data->sym_height * data->line_pos, 
 		data->sym_width, 
 		data->sym_height
 	};
@@ -128,10 +135,12 @@ void draw_text(AppData* app_data, CanvasData *data, SDL_Rect rect) {
 	}
 }
 
-void canvas_update(AppData* app_data, ContextForward context, SDL_Rect rect, void** d) {
-	if (*d == NULL) *d = init_canvas_data(app_data->sdl.renderer, rect);
+void canvas_update(AppData* app_data, ContextForward context, RelativeRect rect, void** d) {
+	if (*d == NULL || context.frame_update) *d = init_canvas_data(app_data, rect);
 	CanvasData *data = (CanvasData*)*d;
 	update_text(app_data, data);
-	draw_cursor(app_data, data, rect);
-	if (context.visible) draw_text(app_data, data, rect);
+	if (context.visible) {
+		draw_cursor(app_data, data);
+		draw_text(app_data, data);
+	}
 }

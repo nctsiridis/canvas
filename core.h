@@ -11,6 +11,11 @@ struct ContextNode;
 struct ContextComponentNode;
 
 typedef struct {
+	int x_norm, y_norm;
+	float w_norm, h_norm;
+} RelativeRect;
+
+typedef struct {
 	int window_width, window_height;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
@@ -32,8 +37,8 @@ typedef struct ContextForward {
 } ContextForward;
 
 typedef struct {
-	void (*update)(AppData *app_data, ContextForward context, SDL_Rect rect, void** d);
-	SDL_Rect rect;
+	void (*update)(AppData *app_data, ContextForward context, RelativeRect rect, void** d);
+	RelativeRect rect;
 	void* data;
 } ContextComponent;
 

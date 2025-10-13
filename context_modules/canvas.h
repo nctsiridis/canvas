@@ -14,9 +14,10 @@ typedef struct {
 	int line_pos, inline_pos, frame_pos; // frame_pos = index of first line in the visible frame
 	LineNode *line;
 	SDL_Texture **glyphs;
+	SDL_Rect rect;
 } CanvasData;
 
-void canvas_update(AppData* app_data, ContextForward context, SDL_Rect rect, void** d);
+void canvas_update(AppData* app_data, ContextForward context, RelativeRect rect, void** d);
 
 CanvasData* canvas_default_data();
 

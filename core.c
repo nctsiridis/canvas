@@ -21,7 +21,7 @@ AppData default_app_data() {
 	SDL_Rect default_view_rect = {0, 0, 500, 500};
 	SDLData sdl_data = sdl_compose("Canvas", default_view_rect, SDL_WINDOW_RESIZABLE, 0);
 
-	ContextComponent default_view = {.update=canvas_update, .rect=default_view_rect, .data=NULL};
+	ContextComponent default_view = {.update=canvas_update, .rect=(RelativeRect){0, 0, 1, 1}, .data=NULL};
 	ContextComponentNode *context_component_head = malloc(sizeof(*context_component_head));
 	*context_component_head = (ContextComponentNode){default_view, NULL, NULL};
 
