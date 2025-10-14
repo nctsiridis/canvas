@@ -1,0 +1,9 @@
+TODO:
+- Canvas Module:
+	- Modes (and proper structure for expansion)
+	- New line (copy text down)
+	- File loading / saving
+	- Custom keybinds (yml for tree based) implement trie-like solution
+	- Delete line, copy paste, etc
+- start on Tab module
+
