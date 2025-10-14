@@ -24,7 +24,7 @@ LineNode* make_new_line(int size) {
 	res->text = calloc(size, sizeof(char));
 	res->length = 0;
 	res->gbuff_pos = 0;
-	res->gbuff_size = size;
+	res->gbuff_size = size - 1;
 	return res;
 }
 
@@ -114,7 +114,7 @@ void update_text(AppData* app_data, CanvasData *data) {
 
 void draw_cursor(AppData* app_data, CanvasData* data) {
 	SDL_SetRenderDrawColor(app_data->sdl.renderer, 0xFF, 0x00, 0x00, 0xFF);
-	SDL_RenderDrawRect(
+	SDL_RenderFillRect(
 		app_data->sdl.renderer, 
 		&((SDL_Rect){
 			data->rect.x + data->sym_width * data->line->gbuff_pos, 
