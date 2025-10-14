@@ -3,12 +3,28 @@
 #define ROWS_ON_SCREEN 30
 #define COLS_ON_SCREEN 50
 
+// DEBUG FUNCTIONS
+void debug_print_gap_buffer(CanvasData* data) {
+	printf("Gap buffer: ");
+	for (int i = 0; i < data->line_size; i++) {
+		char c = data->line->text[i];
+		if (isprint(c)) {
+			printf("%c", c);
+		} else if (c == '\0') {
+			printf("_");
+		}
+	}
+	printf("\n");
+}
+
 LineNode* make_new_line(int size) {
 	LineNode *res = malloc(sizeof(LineNode));
 	res->prev = NULL;
 	res->next = NULL;
 	res->text = calloc(size, sizeof(char));
 	res->length = 0;
+	res->gbuff_pos = 0;
+	res->gbuff_size = size;
 	return res;
 }
 
@@ -28,7 +44,7 @@ CanvasData* init_canvas_data(AppData *app_data, RelativeRect rect) {
 	canvas_data->sym_width = true_rect.w / COLS_ON_SCREEN;
 	canvas_data->sym_height = true_rect.h / ROWS_ON_SCREEN;
 	canvas_data->line_pos = 0;
-	canvas_data->inline_pos = 0;
+	canvas_data->line_size = COLS_ON_SCREEN;
 	canvas_data->frame_pos = 0;
 	canvas_data->glyphs = malloc(sizeof(SDL_Texture*) * 127);
 	canvas_data->line = make_new_line(COLS_ON_SCREEN);
@@ -45,37 +61,53 @@ CanvasData* init_canvas_data(AppData *app_data, RelativeRect rect) {
 
 void update_text(AppData* app_data, CanvasData *data) {
 	if (app_data->sdl.event->type == SDL_TEXTINPUT) {
-		if (data->inline_pos < data->cols_on_screen - 1) {
-			data->line->text[data->inline_pos] = app_data->sdl.event->text.text[0];
+		if (data->line->gbuff_size > 0) {
+			data->line->text[data->line->gbuff_pos] = app_data->sdl.event->text.text[0];
 			data->line->length++;
-			data->inline_pos++;
+			data->line->gbuff_pos++;
+			data->line->gbuff_size--;
 		}
 	}
 	if (app_data->sdl.event->type == SDL_KEYDOWN) {
 		SDL_Keycode key = app_data->sdl.event->key.keysym.sym;
 		if (key == SDLK_BACKSPACE) {
-			if (data->inline_pos > 0) {
-				data->inline_pos--;
+			if (data->line->gbuff_pos > 0) {
+				data->line->gbuff_pos--;
+				data->line->gbuff_size++;
 				data->line->length--;
-				data->line->text[data->inline_pos] = '\0';
+				data->line->text[data->line->gbuff_pos] = '\0';
 			} else if (data->line->prev) {
 				// TODO make delete line a helper
 				LineNode *temp = data->line;
 				data->line->prev->next = data->line->next;
 				data->line = data->line->prev;
-				data->inline_pos = data->line->length + 1;
 				data->line_pos--;
 				free(temp);
 			}
 		} else if (key == SDLK_RETURN) {
-			if (data->inline_pos < data->cols_on_screen) {
-				data->line->text[data->inline_pos] = '\n';
+			if (data->line->gbuff_pos < data->cols_on_screen) {
+				data->line->text[data->line->gbuff_pos] = '\n'; // if leftover clear
 				if (data->line->next == NULL) data->line->next = make_new_line(data->cols_on_screen);
 				data->line->next->prev = data->line;
 				data->line = data->line->next;
 				data->line_pos++;
-				data->inline_pos = 0;
 			}
+		} else if (key == SDLK_LEFT) {
+			if (data->line->gbuff_pos > 0) {
+				data->line->gbuff_pos--;
+				char c = data->line->text[data->line->gbuff_pos];
+				data->line->text[data->line->gbuff_pos] = '\0';
+				data->line->text[data->line->gbuff_pos + data->line->gbuff_size] = c;
+			}
+			debug_print_gap_buffer(data);
+		} else if (key == SDLK_RIGHT) {
+			if (data->line->gbuff_pos + data->line->gbuff_size + 1 < data->line_size) {
+				char c = data->line->text[data->line->gbuff_pos + data->line->gbuff_size];
+				data->line->text[data->line->gbuff_pos + data->line->gbuff_size] = '\0';
+				data->line->text[data->line->gbuff_pos] = c;
+				data->line->gbuff_pos++;
+			}
+			debug_print_gap_buffer(data);
 		}
 	}
 }
@@ -85,7 +117,7 @@ void draw_cursor(AppData* app_data, CanvasData* data) {
 	SDL_RenderDrawRect(
 		app_data->sdl.renderer, 
 		&((SDL_Rect){
-			data->rect.x + data->sym_width * data->inline_pos, 
+			data->rect.x + data->sym_width * data->line->gbuff_pos, 
 			data->rect.y + data->sym_height * data->line_pos,
 			data->sym_width, 
 			data->sym_height
@@ -107,10 +139,11 @@ void draw_text(AppData* app_data, CanvasData *data) {
 
 	// draw down phase
 	while (line_iter_down) {
-		for (char *p = line_iter_down->text; *p; p++) {
-			if (*p == '\n') break;
-			if (*p < 32 || *p > 126) continue;
-			SDL_RenderCopy(app_data->sdl.renderer, data->glyphs[*p], NULL, &dst);
+		for (int i = 0; i < data->line_size; i++) {
+			char p = line_iter_down->text[i];
+			if (p == '\n') break;
+			if (p < 32 || p > 126) continue;
+			SDL_RenderCopy(app_data->sdl.renderer, data->glyphs[p], NULL, &dst);
 			dst.x += data->sym_width;
 		}
 		line_iter_down = line_iter_down->next;
