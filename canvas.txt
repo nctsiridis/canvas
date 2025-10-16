@@ -1,0 +1,5 @@
+
+Insert mode
+Command mode (insert but when you hit enter it runs the command from the current terminal context)
+
+What is the capital of the united states

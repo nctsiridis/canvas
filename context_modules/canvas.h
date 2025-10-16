@@ -2,6 +2,10 @@
 #define CANVAS_H
 #include "../core.h"
 
+//typedef struct CmdNode {
+//	CmdNode
+//}
+
 typedef struct LineNode {
 	struct LineNode *prev, *next;
 	char* text;
