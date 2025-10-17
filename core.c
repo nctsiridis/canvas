@@ -17,6 +17,20 @@ SDLData sdl_compose(
 	return res;
 }
 
+InputHandleNode *make_input_handle_node(char* filepath) {
+	// RETURN: InputHandleNode with Trie initialized
+	// parse 
+	file_t f = f_init(filepath);
+	printf("got %u lines\n", f->filesize);
+	if (f->filesize > 0) {
+		char* filedata = f_read_file(f);
+		cJSON *json = cJSON_Parse(filedata);
+		f_free(f);
+		printf("DEBUG: first string parsed: %s\n", json->valuestring);
+	}
+	return NULL;
+}
+
 AppData default_app_data() {
 	SDL_Rect default_view_rect = {0, 0, 500, 500};
 	SDLData sdl_data = sdl_compose("Canvas", default_view_rect, SDL_WINDOW_RESIZABLE, 0);
@@ -30,7 +44,8 @@ AppData default_app_data() {
 	ContextNode *context_head = malloc(sizeof(*context_head));
 	*context_head = (ContextNode){canvas, NULL, NULL};
 
-	AppData res = {true, 0, 1, 10, context_head, sdl_data};
+	InputHandleNode *default_input_handle_node = make_input_handle_node("");
+	AppData res = {true, 0, 1, 10, context_head, sdl_data, default_input_handle_node};
 	return res;
 }
 

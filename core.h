@@ -6,7 +6,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
+#include <map_unordered.h>
+#include <cJSON.h>
+#include <fileutils.h>
 
+struct HandlerNode;
 struct ContextNode;
 struct ContextComponentNode;
 
@@ -22,13 +26,25 @@ typedef struct {
 	SDL_Event *event;
 } SDLData;
 
+typedef struct HandlerNode {
+	struct HandlerNode *prev;
+	MapUnordered *mp;
+	void (*function); // NULL if none
+} HandlerNode;
+
+typedef struct InputHandleNode {
+	struct InputHandleNode *next, *prev;
+	HandlerNode *node;
+} InputHandleNode;
+
 typedef struct {
 	bool running;
 	int context_index; // int -> Widget *, use hash function
 	int tab_count;
 	int tab_size; // percentage
-	struct ContextNode* context_head;
+	struct ContextNode *context_head;
 	SDLData sdl;
+	InputHandleNode *input_handler;
 } AppData;
 
 typedef struct ContextForward {

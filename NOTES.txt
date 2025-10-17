@@ -1,0 +1,12 @@
+For parsing commands:
+
+ASCII based control
+
+control context: 
+
+concept: context control stack
+
+context_control_trie_3 (")
+context_control_trie_2 (")
+context_control_trie_1 (added by an application, MUST INCLUDE POP MAPPING)
+context_control_trie_0 (base application, can never be popped)
