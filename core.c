@@ -1,6 +1,22 @@
 #include "core.h"
 #include "context_modules/canvas.h"
 
+// COMMAND FUNCTIONS
+
+void cmd_root_quit() {
+	printf("TODO quit\n");
+}
+
+void cmd_root_delete() {
+	printf("TODO delete\n");
+}
+
+void cmd_root_tab_switch() {
+	printf("TODO tab switch\n");
+}
+
+// --
+
 SDLData sdl_compose(
 	char* window_name,
 	SDL_Rect rect,
@@ -17,18 +33,53 @@ SDLData sdl_compose(
 	return res;
 }
 
-InputHandleNode *make_input_handle_node(char* filepath) {
-	// RETURN: InputHandleNode with Trie initialized
-	// parse 
-	file_t f = f_init(filepath);
-	printf("got %u lines\n", f->filesize);
-	if (f->filesize > 0) {
-		char* filedata = f_read_file(f);
-		cJSON *json = cJSON_Parse(filedata);
-		f_free(f);
-		printf("DEBUG: first string parsed: %s\n", json->valuestring);
-	}
+void *cmd_name_to_function(char* name) {
+	printf("TODO cmd_name_to_function\n");
 	return NULL;
+}
+
+char key_name_to_char(char* name) {
+	switch (name) {
+		case "ascii_r":
+			return 'r';
+		case "ascii_q":
+			return 'q';
+		case "ascii_delete";
+			return 0x7f
+	}
+}
+
+HandlerNode *handler_node_from_json(cJSON *json) {
+	HandlerNode *res = malloc(sizeof(HandlerNode));
+	res->mp = map_unordered_new(1, sizeof(HandlerNode*), 5, 5, &byte_hash);
+	res->function = NULL;
+	res->prev = NULL;
+	printf("json->value = \n", json->value);
+	if (json->value != "(null)") {
+		res->function = cmd_name_to_function(json->value);
+	} else {
+		while (json) {
+			char key = key_name_to_char(json->child->value);
+			HandlerNode *child = handler_node_from_json(json->child);
+			map_unordered_insert(res->mp, key, child);
+			child->prev = res;
+			json = json->next;
+		}
+	}
+	return res;
+}
+
+InputHandleNode *make_input_handle_node(char* filepath) {
+	InputHandleNode *res = malloc(sizeof(InputHandleNode));
+	res->next = NULL;
+	res->prev = NULL;
+	file_t f = f_init(filepath);
+	if (f) {
+		cJSON *json = cJSON_Parse(f_read_file(f));
+		f_free(f);
+		res->node = hander_node_from_json(json);
+	}
+	return res;
 }
 
 AppData default_app_data() {
@@ -44,7 +95,7 @@ AppData default_app_data() {
 	ContextNode *context_head = malloc(sizeof(*context_head));
 	*context_head = (ContextNode){canvas, NULL, NULL};
 
-	InputHandleNode *default_input_handle_node = make_input_handle_node("");
+	InputHandleNode *default_input_handle_node = make_input_handle_node("canvas.json");
 	AppData res = {true, 0, 1, 10, context_head, sdl_data, default_input_handle_node};
 	return res;
 }

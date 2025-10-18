@@ -1,29 +1,6 @@
 {
-	"root": {
+	"ascii_r": {
 		"ascii_q": "quit",
-		"ascii_delete": "delete",
-		"ascii_t": {
-			"wait_any": "tab_switch" 
-		}
-	},
-	"canvas": {
-		"ascii_q": "pop",
-		"ascii_i": "enter_insert",
-		"ascii_k": "cursor_down",
-		"ascii_l": "cursor_up",
-		"ascii_colon": "cursor_right",
-		"ascii_j": "cursor_left"
-	},
-	"canvas-insert": {
-		"any": "place_key",
-		"ascii_f": {
-			"ascii_j": "pop"
-		},
-		"ascii_z": {
-			"ascii_z": "delete_line"
-		},
-		"ascii_x": {
-			"ascii_x": "delete_word"
-		}
+		"ascii_delete": "delete"
 	}
 }
