@@ -39,6 +39,7 @@ CanvasData* init_canvas_data(AppData *app_data, RelativeRect rect) {
 	SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
 	TTF_Font* font = TTF_OpenFont("res/short_baby.ttf", 20);
 	if (!font) printf("Font creationg failed\n");
+	canvas_data->visible = false;
 	canvas_data->rows_on_screen = ROWS_ON_SCREEN; // TODO
 	canvas_data->cols_on_screen = COLS_ON_SCREEN;
 	canvas_data->sym_width = true_rect.w / COLS_ON_SCREEN;
@@ -168,11 +169,11 @@ void draw_text(AppData* app_data, CanvasData *data) {
 	}
 }
 
-void canvas_update(AppData* app_data, ContextForward context, RelativeRect rect, void** d) {
-	if (*d == NULL || context.frame_update) *d = init_canvas_data(app_data, rect);
-	CanvasData *data = (CanvasData*)*d;
+void canvas_update(AppData* app_data, ContextComponent *self) {
+	if (self->data == NULL) self->data = init_canvas_data(app_data, self->rect);
+	CanvasData *data = (CanvasData*)self->data;
 	update_text(app_data, data);
-	if (context.visible) {
+	if (self->visible) {
 		draw_cursor(app_data, data);
 		draw_text(app_data, data);
 	}

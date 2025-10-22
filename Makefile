@@ -9,7 +9,7 @@ HII_PATH = $(DAROOT)/github~nctsiridis/hii@v1.0.0
 HASH_PATH = $(DAROOT)/github~nctsiridis/hash@v1.0.0
 CJSON_PATH = $(DAROOT)/github~DaveGamble/cJSON@v1.7.19
 FILEUTILS_PATH = $(DAROOT)/github~barrust/c-utils@v0.2.5/src
-BIN = program
+BIN = build/program
 
 DFLAGS = -Wall -Wextra
 CFLAGS = -I$(SDL_INCLUDE) -I$(HII_PATH) -I$(HASH_PATH) -I$(CJSON_PATH) -I$(FILEUTILS_PATH)
@@ -35,7 +35,7 @@ build_modules:
 	$(CC) $(CFLAGS) -c context_modules/canvas.c -o build/canvas.o
 
 run: all
-	./program
+	./build/program
 
 debug: all
-	lldb ./program
+	lldb ./build/program

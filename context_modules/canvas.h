@@ -15,6 +15,7 @@ typedef struct LineNode {
 } LineNode;
 
 typedef struct {
+	bool visible;
 	int rows_on_screen, cols_on_screen;
 	int sym_width, sym_height;
 	int line_pos, line_size, frame_pos; // frame_pos = index of first line in the visible frame
@@ -23,7 +24,7 @@ typedef struct {
 	SDL_Rect rect;
 } CanvasData;
 
-void canvas_update(AppData* app_data, ContextForward context, RelativeRect rect, void** d);
+void canvas_update(AppData* app_data, ContextComponent *self);
 
 CanvasData* canvas_default_data();
 

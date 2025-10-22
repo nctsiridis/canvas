@@ -17,11 +17,11 @@ int main() {
 	while (app_data.running) {
 		SDL_Event e;
 		SDL_WaitEvent(&e);
-		ContextForward context = {false, false};
-		parse_sdl_event(&app_data, &e, &context);
+		app_data.sdl.event = &e; // TODO make not pointer
+		parse_sdl_event(&app_data);
 		SDL_SetRenderDrawColor(app_data.sdl.renderer, 0, 0, 0, 255);
 		SDL_RenderClear(app_data.sdl.renderer);
-		context_update_all(&app_data, context);
+		context_update_all(&app_data);
 		SDL_RenderPresent(app_data.sdl.renderer);
 	}
 

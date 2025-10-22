@@ -12,6 +12,7 @@
 
 struct HandlerNode;
 struct ContextNode;
+struct ContextComponent;
 struct ContextComponentNode;
 
 typedef struct {
@@ -47,13 +48,10 @@ typedef struct {
 	InputHandleNode *input_handler;
 } AppData;
 
-typedef struct ContextForward {
-	bool visible;
-	bool frame_update;
-} ContextForward;
 
-typedef struct {
-	void (*update)(AppData *app_data, ContextForward context, RelativeRect rect, void** d);
+typedef struct ContextComponent {
+	bool visible;
+	void (*update)(AppData *app_data, struct ContextComponent *d);
 	RelativeRect rect;
 	void* data;
 } ContextComponent;
@@ -76,8 +74,6 @@ typedef struct ContextNode {
 	struct ContextNode *prev;
 } ContextNode;
 
-typedef struct ContextBackward {
-} ContextBackward;
 
 SDLData sdl_compose(
 	char* window_name,
@@ -88,8 +84,8 @@ SDLData sdl_compose(
 AppData default_app_data();
 void close_sdl(AppData *app_data);
 void render_base(AppData *app_data);
-void context_update_all(AppData *app_data, ContextForward context);
-void parse_sdl_event(AppData *app_data, SDL_Event *e, ContextForward *context);
+void context_update_all(AppData *app_data);
+void parse_sdl_event(AppData *app_data);
 
 #endif
 
