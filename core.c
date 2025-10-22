@@ -34,19 +34,29 @@ SDLData sdl_compose(
 }
 
 void *cmd_name_to_function(char* name) {
-	printf("TODO cmd_name_to_function\n");
+	printf("Got: %s\n", name);
+	if (strcmp(name, "quit") == 0) {
+		printf("returning quit\n");
+		return &cmd_root_quit;
+	} else if (strcmp(name, "delete") == 0) {
+		printf("returning delete\n");
+		return &cmd_root_delete;
+	} else if (strcmp(name, "tab_switch") == 0) {
+		printf("returning tab_switch\n");
+		return &cmd_root_tab_switch;
+	}
 	return NULL;
 }
 
 char key_name_to_char(char* name) {
-	switch (name) {
-		case "ascii_r":
-			return 'r';
-		case "ascii_q":
-			return 'q';
-		case "ascii_delete";
-			return 0x7f
+	if (strcmp(name, "ascii_r") == 0) {
+		return 'r';
+	} else if (strcmp(name, "ascii_q") == 0) {
+		return 'q';
+	} else if (strcmp(name, "ascii_delete") == 0) {
+		return 0x7f;
 	}
+	return '\0';
 }
 
 HandlerNode *handler_node_from_json(cJSON *json) {
@@ -54,17 +64,17 @@ HandlerNode *handler_node_from_json(cJSON *json) {
 	res->mp = map_unordered_new(1, sizeof(HandlerNode*), 5, 5, &byte_hash);
 	res->function = NULL;
 	res->prev = NULL;
-	printf("json->value = \n", json->value);
-	if (json->value != "(null)") {
-		res->function = cmd_name_to_function(json->value);
-	} else {
-		while (json) {
-			char key = key_name_to_char(json->child->value);
+	while (json) {
+		if (json->valuestring) {
+			res->function = cmd_name_to_function(json->valuestring);
+		} else {
+			printf("key: %s\n", json->string);
+			char key = key_name_to_char(json->child->string);
 			HandlerNode *child = handler_node_from_json(json->child);
-			map_unordered_insert(res->mp, key, child);
+			map_unordered_insert(res->mp, &key, child);
 			child->prev = res;
-			json = json->next;
 		}
+		json = json->next;
 	}
 	return res;
 }
@@ -77,7 +87,9 @@ InputHandleNode *make_input_handle_node(char* filepath) {
 	if (f) {
 		cJSON *json = cJSON_Parse(f_read_file(f));
 		f_free(f);
-		res->node = hander_node_from_json(json);
+		char* jstr = cJSON_Print(json);
+		printf("Json: %s\n", jstr);
+		res->node = handler_node_from_json(json);
 	}
 	return res;
 }
