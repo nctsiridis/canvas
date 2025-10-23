@@ -141,13 +141,27 @@ void context_update_all(AppData* app_data) {
 }
 
 void parse_sdl_event(AppData *app_data) {
-	printf("Handle input here\n");
-	if (app_data->sdl.event->type == SDL_QUIT) {
+	SDL_Event e = *app_data->sdl.event;
+	if (e.type == SDL_QUIT) {
 		app_data->running = false;
-	} else if (app_data->sdl.event->type == SDL_WINDOWEVENT) {
-		if (app_data->sdl.event->window.event == SDL_WINDOWEVENT_RESIZED) {
-			app_data->sdl.window_width = app_data->sdl.event->window.data1;
-			app_data->sdl.window_height = app_data->sdl.event->window.data2;
+	} else if (e.type == SDL_WINDOWEVENT) {
+		if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
+			app_data->sdl.window_width = e.window.data1;
+			app_data->sdl.window_height = e.window.data2;
 		}
-	} 
+	} else if (e.type == SDL_KEYDOWN) {
+		// advance
+		SDL_Keycode key = e.key.keysym.sym;
+		char c = (char)key;
+		if (app_data->input_handler->node->mp) printf("you should see this\n");
+		printf("trying\n");
+		printf("here, map size is: %d\n", app_data->input_handler->node->mp->size);
+		void *nxt = map_unordered_get(app_data->input_handler->node->mp, &c);
+		printf("here?\n");
+		if (nxt) {
+			HandlerNode *nxtHandler = (HandlerNode*)nxt;
+			printf("found\n");
+			app_data->input_handler->node = nxtHandler;
+		}
+	}
 }

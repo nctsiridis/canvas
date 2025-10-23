@@ -172,7 +172,8 @@ void draw_text(AppData* app_data, CanvasData *data) {
 void canvas_update(AppData* app_data, ContextComponent *self) {
 	if (self->data == NULL) self->data = init_canvas_data(app_data, self->rect);
 	CanvasData *data = (CanvasData*)self->data;
-	update_text(app_data, data);
+	//update_text(app_data, data);
+	
 	if (self->visible) {
 		draw_cursor(app_data, data);
 		draw_text(app_data, data);
